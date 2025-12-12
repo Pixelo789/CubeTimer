@@ -39,7 +39,7 @@ class CubeTimerApplication(Adw.Application):
         # Translators: Replace "translator-credits" with your names, one name per line
         about.set_translator_credits(_("translator-credits"))
         about.set_copyright("© 2025 Vallabh Vidyasagar")
-        about.present()
+        about.present(self.props.active_window)
 
     def on_preferences_action(self, widget, _):
         """Callback for the app.preferences action."""
