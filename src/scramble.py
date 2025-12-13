@@ -11,8 +11,8 @@ class Scramble(Gtk.Label):
         self.scramble = scramble_gen(number, self.dim)
         self.set_text(self.scramble)
 
-    def update_scramble(self, dim=""):
-        if len(dim) > 0:
+    def update_scramble(self, dim=None):
+        if dim:
             self.dim = dim
 
         font_size = {
@@ -27,7 +27,7 @@ class Scramble(Gtk.Label):
             "Skewb": 44
         }
         self.scramble = scramble_gen(number, self.dim)
-        self.set_markup(f"<span size='{font_size[self.dim] * 1024}'>{self.scramble}</span>")
+        self.set_markup(f"<span size='{font_size[self.dim]}pt'>{self.scramble}</span>")
 
     def show_scramble(self):
         self.set_visible(True)
