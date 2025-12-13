@@ -1,4 +1,4 @@
-import random
+from random import choice, randint
 from pathlib import Path
 import os
 from math import ceil
@@ -16,6 +16,14 @@ opposing_faces = {
     "B": "F"
 }
 
+_2_3_moves = (
+    'U',
+    'D',
+    'R',
+    'L',
+    'F',
+    'B'
+)
 _4_5_moves = (
     'U', 'Uw',
     'D', 'Dw',
@@ -32,6 +40,8 @@ _6_7_moves = (
     'F', 'Fw', '3Fw',
     'B', 'Bw', '3Bw'
 )
+directions_3 = ("", "'")
+directions_4 = ("", "'", "2")
 
 def calc_time(time):
     minutes = time // 6000
@@ -55,17 +65,20 @@ def time_string(time):
 
     return time_str
 
+
+# Scrambling
+
 def get_nxn_face(move):
     for i in move:
         if i in opposing_faces:
             return i
+    raise LookupError(f"Turn {move} does not have a face. Is this an NxN move?")
 
+
+pyraminx_moves = ('L', 'R', 'B', 'U')
+pyraminx_tip_moves = ('l', 'r', 'b', 'u')
 def pyraminx_skewb_scramble(scramble_length, dim="Pyraminx"):
     # NOTE: Assume a scramble length of 20, then scale
-
-    directions = ("", "'")
-    moves = ('U', 'R', 'L', 'B')
-    tip_moves = ('l', 'r', 'b', 'u')
 
     scramble_length = ceil(scramble_length / 2)
 
@@ -73,16 +86,16 @@ def pyraminx_skewb_scramble(scramble_length, dim="Pyraminx"):
     previous = None
     for n in range(scramble_length):
         # Create a list of allowed moves
-        allowed = list(range(len(moves)))
+        allowed = list(range(len(pyraminx_moves)))
         if previous != None:
             allowed.pop(previous)
 
         # Get a random move from the above list
-        next_indice = random.choice(allowed)
-        move = moves[next_indice]
+        next_indice = choice(allowed)
+        move = pyraminx_moves[next_indice]
 
         # Get a random direction
-        direction = random.choice(directions)
+        direction = choice(directions_3)
 
         scramble.append(move + direction)
 
@@ -90,8 +103,8 @@ def pyraminx_skewb_scramble(scramble_length, dim="Pyraminx"):
         previous = next_indice
 
     if dim == "Pyraminx":
-        for i in tip_moves:
-            tip_move = random.randint(1, 3)
+        for i in pyraminx_tip_moves:
+            tip_move = randint(1, 3)
             if tip_move == 2:
                 scramble.append(i)
             elif tip_move == 3:
@@ -99,71 +112,62 @@ def pyraminx_skewb_scramble(scramble_length, dim="Pyraminx"):
 
     return "  ".join(scramble)
 
-def megaminx_scramble():
-    directions_face = ("", "'")
-    directions_large = ("--", "+\u2060+")
-    moves_large = ("R", "D")
 
+megaminx_directions_large = ("--", "+\u2060+")
+megaminx_moves_large = ("R", "D")
+def megaminx_scramble():
     scramble = []
     for i in range(7):
         # Large moves
         for j in range(10):
-            direction = random.choice(directions_large)
-            scramble.append(moves_large[j % 2] + direction)
+            direction = choice(megaminx_directions_large)
+            scramble.append(megaminx_moves_large[j % 2] + direction)
 
         # Face move
-        direction = random.choice(directions_face)
+        direction = choice(directions_3)
         scramble.append("U" + direction)
 
     return "  ".join(scramble)
 
+
+def clock_num_to_rotation(num):
+    string = str(abs(num))
+    if num >= 0:
+        return string + "+"
+    else:
+        return string + "-"
+
+clock_moves_set1 = (
+    "UR",
+    "DR",
+    "DL",
+    "UL"
+)
+clock_moves_set2 = (
+    "U",
+    "R",
+    "D",
+    "L",
+    "ALL"
+)
 def clock_scramble():
-    moves_set1 = (
-        "UR",
-        "DR",
-        "DL",
-        "UL"
-    )
-    moves_set2 = (
-        "U",
-        "R",
-        "D",
-        "L",
-        "ALL"
-    )
-
-    def rotation_str(num):
-        string = str(abs(num))
-        if num >= 0:
-            return string + "+"
-        else:
-            return string + "-"
-
     scramble = []
-    for i in moves_set1:
-        scramble.append(i + rotation_str(random.randint(-5, 6)))
+    for i in clock_moves_set1:
+        scramble.append(i + clock_num_to_rotation(randint(-5, 6)))
 
     for i in range(2):
-        for j in moves_set2:
-            scramble.append(j + rotation_str(random.randint(-5, 6)))
+        for j in clock_moves_set2:
+            scramble.append(j + clock_num_to_rotation(randint(-5, 6)))
         scramble.append("y2")
 
     scramble.pop(-1)
     return "  ".join(scramble)
 
+
 def scramble_gen(scramble_length, dim="3x3x3"):
     # NOTE: Assume a scramble length of 20, then scale
 
-    directions = ("", "'", "2")
-
-    moves = (
-        'U',
-        'D',
-        'R',
-        'L',
-        'F',
-        'B'
-    )
+    moves = _2_3_moves
     if dim == "2x2x2":
         scramble_length = ceil(scramble_length / 2)
     elif dim == "4x4x4":
@@ -196,11 +200,11 @@ def scramble_gen(scramble_length, dim="3x3x3"):
             allowed.pop(previous[i])
 
         # Get a random move from the above list
-        next_indice = random.choice(allowed)
+        next_indice = choice(allowed)
         move = moves[next_indice]
 
         # Get a random direction
-        direction = random.choice(directions)
+        direction = choice(directions_4)
 
         scramble.append(move + direction)
 
