@@ -37,7 +37,7 @@ When the project successfully ran, you can create a Flatpak-bundle on the buildc
 You can also build and install this project by running the following in the root of the project:
 
 ```sh
-flatpak-builder builddir --user --install --force-clean
+flatpak-builder builddir --user --install --force-clean io.github.vallabhvidy.CubeTimer.json
 ```
 
 ## Feedback and bug reports
